@@ -5,7 +5,7 @@ import depth.mvp.thinkerbell.domain.notice.dto.DormitoryEntryNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.entity.AcademicSchedule;
 import depth.mvp.thinkerbell.domain.notice.repository.AcademicScheduleRepository;
 import depth.mvp.thinkerbell.domain.user.service.BookmarkService;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import depth.mvp.thinkerbell.global.exception.MapperException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
