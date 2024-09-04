@@ -11,7 +11,7 @@ import depth.mvp.thinkerbell.domain.notice.entity.SafetyNotice;
 import depth.mvp.thinkerbell.domain.notice.repository.SafetyNoticeRepository;
 import depth.mvp.thinkerbell.domain.user.service.BookmarkService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

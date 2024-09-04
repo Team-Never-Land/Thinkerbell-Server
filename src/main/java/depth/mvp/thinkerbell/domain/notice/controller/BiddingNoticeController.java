@@ -4,7 +4,7 @@ import depth.mvp.thinkerbell.domain.common.pagination.PaginationDTO;
 import depth.mvp.thinkerbell.domain.notice.dto.BiddingNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.service.BiddingNoticeService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,11 +33,8 @@ public class BiddingNoticeController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam("ssaid") String ssaid) {
-        try {
+
             PaginationDTO<BiddingNoticeDTO> paginationDTO = biddingNoticeService.getAllBiddingNotices(page, size, ssaid);
             return ApiResult.ok(paginationDTO);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

@@ -3,7 +3,7 @@ package depth.mvp.thinkerbell.domain.notice.controller;
 import depth.mvp.thinkerbell.domain.notice.dto.AcademicScheduleDto;
 import depth.mvp.thinkerbell.domain.notice.service.AcademicScheduleService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,13 +35,8 @@ public class AcademicScheduleController {
             @Parameter(description = "조회할 월 (1~12)", required = true)
             @RequestParam int month,
             @RequestParam String ssaid) {
-        try {
+
             List<AcademicScheduleDto> schedules = academicScheduleService.getMonthlySchedule(month, ssaid);
             return ApiResult.ok(schedules);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, null);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

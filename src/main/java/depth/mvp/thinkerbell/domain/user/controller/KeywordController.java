@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,28 +33,33 @@ public class KeywordController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping("/save")
-    public ApiResult<String> saveKeyword(@RequestParam String keyword, @RequestParam String userSSAID) {
+    public ResponseEntity<ApiResult<String>> saveKeyword(@RequestParam String keyword, @RequestParam String userSSAID) {
 
         if (!keywordSaveService.isExistKeyword(keyword)){
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "해당 키워드는 존재하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "해당 키워드는 존재하지 않습니다."));
         }
 
         if (!keywordSaveService.countKeyword(keyword)){
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드는 두글자 이상이여야 합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드는 두글자 이상이여야 합니다."));
         }
 
         if (keywordSaveService.isDuplicateKeyword(keyword, userSSAID)){
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "이미 등록된 키워드 입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "이미 등록된 키워드 입니다."));
         }
 
         if (!keywordSaveService.overNineKeyword(userSSAID)){
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드는 9개까지 저장 가능합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드는 9개까지 저장 가능합니다."));
         }
 
         if (keywordSaveService.saveKeywordToDB(keyword, userSSAID)){
-            return ApiResult.ok("키워드가 성공적으로 저장되었습니다.");
+            return ResponseEntity.ok(ApiResult.ok("키워드가 성공적으로 저장되었습니다."));
         } else {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, "키워드 저장에 실패했습니다. 사용자를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드 저장에 실패했습니다. 사용자를 찾을 수 없습니다."));
         }
     }
 
@@ -63,12 +70,13 @@ public class KeywordController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PostMapping("/delete")
-    public ApiResult<String> deleteKeyword(@RequestParam String keyword, @RequestParam String userSSAID) {
+    public ResponseEntity<ApiResult<String>> deleteKeyword(@RequestParam String keyword, @RequestParam String userSSAID) {
 
-        if (keywordDeleteService.isDeleted(keyword, userSSAID)){
-            return ApiResult.ok("키워드가 성공적으로 삭제되었습니다.");
+        if (keywordDeleteService.isDeleted(keyword, userSSAID)) {
+            return ResponseEntity.ok(ApiResult.ok("키워드가 성공적으로 삭제되었습니다."));
         } else {
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드를 삭제하지 못했습니다. 사용자를 찾을수 없거나 키워드가 존재하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "키워드를 삭제하지 못했습니다. 사용자를 찾을수 없거나 키워드가 존재하지 않습니다."));
         }
     }
 
@@ -82,13 +90,8 @@ public class KeywordController {
     public ApiResult<List<KeywordDto>> getKeywords(
             @Parameter(description = "사용자 SSAID", required = true)
             @RequestParam String userSSAID) {
-        try {
+
             List<KeywordDto> keywords = keywordService.getKeywords(userSSAID);
             return ApiResult.ok(keywords);
-        } catch (IllegalArgumentException e) {
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, null);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

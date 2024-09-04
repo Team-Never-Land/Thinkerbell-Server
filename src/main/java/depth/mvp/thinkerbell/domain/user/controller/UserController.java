@@ -3,7 +3,6 @@ package depth.mvp.thinkerbell.domain.user.controller;
 import depth.mvp.thinkerbell.domain.user.dto.UserDto;
 import depth.mvp.thinkerbell.domain.user.service.UserService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,14 +24,8 @@ public class UserController {
     })
     @PostMapping("/save")
     public ApiResult<String> saveUserInfo(@RequestBody UserDto userDto) {
-        try {
             userService.saveUser(userDto);
 
             return ApiResult.ok("성공적으로 저장됨");
-        } catch (IllegalArgumentException e) {
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, "잘못된 입력 값");
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, "서버 오류 발생");
-        }
     }
 }

@@ -2,7 +2,6 @@ package depth.mvp.thinkerbell.domain.banner;
 
 
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,11 +27,8 @@ public class BannerController {
     })
     @GetMapping
     public ApiResult<List<BannerDTO>> getAllBanners() {
-        try {
+
             List<BannerDTO> banners = bannerService.getAllBanners();
             return ApiResult.ok(banners);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

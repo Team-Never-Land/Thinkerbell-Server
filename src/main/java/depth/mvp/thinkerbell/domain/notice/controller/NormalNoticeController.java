@@ -1,18 +1,14 @@
 package depth.mvp.thinkerbell.domain.notice.controller;
 
 import depth.mvp.thinkerbell.domain.common.pagination.PaginationDTO;
-import depth.mvp.thinkerbell.domain.notice.dto.AcademicNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.dto.NormalNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.service.NormalNoticeService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/normal")
@@ -33,11 +29,8 @@ public class NormalNoticeController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam("ssaid") String ssaid) {
-        try {
+
             PaginationDTO<NormalNoticeDTO> paginationDTO = normalNoticeService.getAllNormalNotices(page, size, ssaid);
             return ApiResult.ok(paginationDTO);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

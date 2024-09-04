@@ -4,7 +4,7 @@ import depth.mvp.thinkerbell.domain.common.pagination.PaginationDTO;
 import depth.mvp.thinkerbell.domain.notice.dto.LibraryNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.service.LibraryNoticeService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -36,11 +36,8 @@ public class LibraryController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam("ssaid") String ssaid,
             @RequestParam("campus") String campus) {
-        try {
+
             PaginationDTO<LibraryNoticeDTO> paginationDTO = libraryNoticeService.getImportantNotices(page, size, ssaid, campus);
             return ApiResult.ok(paginationDTO);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

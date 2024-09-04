@@ -4,7 +4,7 @@ import depth.mvp.thinkerbell.domain.common.pagination.PaginationDTO;
 import depth.mvp.thinkerbell.domain.notice.dto.EventNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.service.EventNoticeService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,11 +35,8 @@ public class EventNoticeController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam("ssaid") String ssaid) {
-        try {
+
             PaginationDTO<EventNoticeDTO> paginationDTO = eventNoticeService.getAllEventNotices(page, size, ssaid);
             return ApiResult.ok(paginationDTO);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }
