@@ -2,7 +2,6 @@ package depth.mvp.thinkerbell.domain.user.controller;
 
 import depth.mvp.thinkerbell.domain.user.service.BookmarkService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,12 +28,8 @@ public class BookmarkController {
     public ApiResult<?> saveBookmark(@RequestParam("category") String category,
                                      @RequestParam("notice-id") Long noticeId,
                                      @RequestParam("ssaid") String ssaid) {
-        try {
             bookmarkService.saveBookmark(category, noticeId, ssaid);
             return ApiResult.ok("성공적으로 저장됨");
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 
     @Operation(summary = "즐겨찾기 취소", description = "공지사항/학사일정을을 즐겨찾기 취소합니다. (true -> false)")
@@ -47,12 +42,9 @@ public class BookmarkController {
     public ApiResult<?> deleteBookmark(@RequestParam("category") String category,
                                      @RequestParam("notice-id") Long noticeId,
                                      @RequestParam("ssaid") String ssaid) {
-        try {
+
             bookmarkService.deleteBookmark(category, noticeId, ssaid);
             return ApiResult.ok("성공적으로 삭제됨");
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 
     @Operation(summary = "공지사항 즐겨찾기 내역 조회", description = "즐겨찾기 설정한 공지사항을 조회합니다. 즐겨찾기했던 순서대로 정렬됩니다.")
@@ -63,11 +55,8 @@ public class BookmarkController {
     })
     @GetMapping("")
     public ApiResult<Map<String, List<?>>> getMarkedNotices(@RequestParam("ssaid") String ssaid) {
-        try {
+
             return ApiResult.ok(bookmarkService.getMarkedNotices(ssaid));
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 
     @Operation(summary = "공지사항 최근 즐겨찾기 3개 내역 조회", description = "즐겨찾기 설정한 최근 3개의 공지사항을 조회합니다 (현장실습 제외)")
@@ -78,10 +67,7 @@ public class BookmarkController {
     })
     @GetMapping("/recent")
     public ApiResult<List<?>> getRecentNotices(@RequestParam("ssaid") String ssaid) {
-        try {
+
             return ApiResult.ok(bookmarkService.getRecentNotices(ssaid));
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

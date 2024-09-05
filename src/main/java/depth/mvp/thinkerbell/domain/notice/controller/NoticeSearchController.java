@@ -2,7 +2,6 @@ package depth.mvp.thinkerbell.domain.notice.controller;
 
 import depth.mvp.thinkerbell.domain.notice.service.NoticeSearchService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,12 +30,9 @@ public class NoticeSearchController {
     @GetMapping("/search")
     public ApiResult<Map<String, List<?>>> searchNotices(@RequestParam String keyword,
                                                          @RequestParam String ssaid) {
-        try {
+
             Map<String, List<?>> notices = noticeSearchService.searchNotices(keyword, ssaid);
             return ApiResult.ok(notices);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 
     @Operation(summary = "5개 카테고리 최근 공지 3개씩 조회", description = "명지대 일반, 학사, 행사, 장학/학자금, 진로/취업/창업 총 5개 카테고리에 대한 최근 3개 " +
@@ -48,11 +44,8 @@ public class NoticeSearchController {
     })
     @GetMapping("/recent")
     public ApiResult<Map<String, List<?>>> getRecentNotices(@RequestParam String ssaid) {
-        try {
+
             Map<String, List<?>> notices = noticeSearchService.getRecentNotices(ssaid);
             return ApiResult.ok(notices);
-        } catch (RuntimeException e) {
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

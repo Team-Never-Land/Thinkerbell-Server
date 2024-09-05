@@ -1,7 +1,6 @@
 package depth.mvp.thinkerbell.domain.notice.service;
 
 import depth.mvp.thinkerbell.domain.notice.dto.AcademicScheduleDto;
-import depth.mvp.thinkerbell.domain.notice.dto.DormitoryEntryNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.entity.AcademicSchedule;
 import depth.mvp.thinkerbell.domain.notice.repository.AcademicScheduleRepository;
 import depth.mvp.thinkerbell.domain.user.service.BookmarkService;

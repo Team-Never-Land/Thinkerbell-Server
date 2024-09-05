@@ -3,7 +3,6 @@ package depth.mvp.thinkerbell.domain.dept_info.controller;
 import depth.mvp.thinkerbell.domain.dept_info.dto.DeptURLDto;
 import depth.mvp.thinkerbell.domain.dept_info.service.DeptURLService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -29,13 +28,8 @@ public class DeptURLController {
     })
     @GetMapping
     public ApiResult<List<DeptURLDto>> getDeptURL() {
-        try{
+
             List<DeptURLDto> url = deptURLService.getAllDeptURL();
             return ApiResult.ok(url);
-        } catch (IllegalArgumentException e){
-            return ApiResult.withError(ErrorCode.INVALID_INPUT_VALUE, null);
-        } catch (RuntimeException e){
-            return ApiResult.withError(ErrorCode.INTERNAL_SERVER_ERROR, null);
-        }
     }
 }

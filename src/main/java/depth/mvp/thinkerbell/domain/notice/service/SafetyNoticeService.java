@@ -1,17 +1,11 @@
 package depth.mvp.thinkerbell.domain.notice.service;
 
 import depth.mvp.thinkerbell.domain.common.pagination.PaginationDTO;
-import depth.mvp.thinkerbell.domain.notice.dto.BiddingNoticeDTO;
-import depth.mvp.thinkerbell.domain.notice.dto.CareerNoticeDTO;
-import depth.mvp.thinkerbell.domain.notice.dto.EventNoticeDTO;
 import depth.mvp.thinkerbell.domain.notice.dto.SafetyNoticeDTO;
-import depth.mvp.thinkerbell.domain.notice.entity.CareerNotice;
-import depth.mvp.thinkerbell.domain.notice.entity.EventNotice;
 import depth.mvp.thinkerbell.domain.notice.entity.SafetyNotice;
 import depth.mvp.thinkerbell.domain.notice.repository.SafetyNoticeRepository;
 import depth.mvp.thinkerbell.domain.user.service.BookmarkService;
-import depth.mvp.thinkerbell.global.dto.ApiResult;
-import depth.mvp.thinkerbell.global.exception.ErrorCode;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
