@@ -204,7 +204,7 @@ public class BookmarkService {
             }
         }
         if (!markedNormalNoticeDtos.isEmpty()) {
-            result.put("markedNormalNotice", markedNormalNoticeDtos);
+            result.put("NormalNotice", markedNormalNoticeDtos);
         }
 
         // AcademicNotice
