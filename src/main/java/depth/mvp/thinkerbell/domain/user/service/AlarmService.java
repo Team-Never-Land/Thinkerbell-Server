@@ -75,7 +75,10 @@ public class AlarmService {
 
                             alarmRepository.save(alarm);
 
-                            fcmService.sendFCMMessage(alarm, keyword.getKeyword());
+                            if (alarm.getUser().getAlarmEnabled()) {
+                                fcmService.sendFCMMessage(alarm, keyword.getKeyword());
+                            }
+
                         } catch (Exception e) {
                             throw new RuntimeException("유저 알림을 저장하거나, fcm 알림을 보내는 도중 오류가 발생했습니다.", e);
                         }
@@ -166,6 +169,24 @@ public class AlarmService {
             return alarmRepository.existsByUserIdAndIsViewedFalse(user.getId());
         }
         return false;
+    }
+
+    //알림 여부 변경
+    public void toggleUserAlarm(String SSAID){
+        User user = userRepository.findBySsaid(SSAID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.toggleAlarmEnabled();
+
+        userRepository.save(user);
+    }
+
+    //알림 여부 조회
+    public boolean getUserAlarm(String SSAID){
+        User user = userRepository.findBySsaid(SSAID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getAlarmEnabled();
     }
 
     //안본거 본걸로 바꾸기
