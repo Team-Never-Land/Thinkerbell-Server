@@ -15,10 +15,16 @@ public class User {
     private Long id;
     private String ssaid;
     private String fcmToken;
+    private Boolean alarmEnabled;
 
     @Builder
-    public User(String ssaid, String fcmToken) {
+    public User(String ssaid, String fcmToken, Boolean alarmEnabled) {
         this.ssaid = ssaid;
         this.fcmToken = fcmToken;
+        this.alarmEnabled = alarmEnabled;
+    }
+
+    public void toggleAlarmEnabled() {
+        this.alarmEnabled = !this.alarmEnabled;
     }
 }

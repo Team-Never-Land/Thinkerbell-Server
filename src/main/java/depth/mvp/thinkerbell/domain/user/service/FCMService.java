@@ -17,9 +17,9 @@ public class FCMService {
     public void sendFCMMessage(Alarm alarm, String keyword) {
         try{
             String category = categoryService.getCategoryNameInKorean(alarm.getNoticeType());
-            String cutTitle = cutTitle(alarm.getTitle(), 30);
+            String cutTitle = cutTitle(alarm.getTitle(), 40);
 
-            String messageBody = String.format("‘띵~🔔 %s와(과) 관련한 공지가 올라왔어요!’\n\n[%s] %s",
+            String messageBody = String.format("띵~🔔 %s와(과) 관련한 공지가 올라왔어요!’\n[%s] %s",
                     keyword, category, cutTitle);
 
             Message message = Message.builder()
