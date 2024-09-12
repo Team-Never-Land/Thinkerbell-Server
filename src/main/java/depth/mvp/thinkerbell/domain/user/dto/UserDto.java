@@ -12,10 +12,12 @@ public class UserDto {
 
     private String ssaid;
     private String deviceToken;
+    private Boolean alarmEnabled;
 
     @Builder
     public UserDto(String ssaid, String deviceToken) {
         this.ssaid = ssaid;
         this.deviceToken = deviceToken;
+        this.alarmEnabled = true;
     }
 }

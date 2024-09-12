@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -67,5 +64,28 @@ public class AlarmController {
     public ApiResult<List<AlarmDto>> getAlarm(@RequestParam String SSAID, @RequestParam String keyword) {
             List<AlarmDto> alarms = alarmService.getAlarms(SSAID, keyword);
             return ApiResult.ok(alarms);
+    }
+
+    @Operation(summary = "알람 여부 조회", description = "사용자 SSAID로 알람 여부를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 확인됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/alarm-status")
+    public ApiResult<Boolean> getAlarmEnabled(@RequestParam String SSAID) {
+        return ApiResult.ok(alarmService.getUserAlarm(SSAID));
+    }
+
+    @Operation(summary = "알람 여부 변경", description = "사용자 SSAID로 알람 여부를 변경합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 변경됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @PatchMapping("/alarm-toggle")
+    public ApiResult<String> toggleUserAlarm(@RequestParam String SSAID) {
+        alarmService.toggleUserAlarm(SSAID);
+        return ApiResult.ok("성공적으로 변경되었습니다.");
     }
 }

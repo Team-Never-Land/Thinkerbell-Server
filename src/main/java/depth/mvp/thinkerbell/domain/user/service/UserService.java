@@ -35,7 +35,7 @@ public class UserService {
             }
         }
 
-        User newUser = new User(userDto.getSsaid(), userDto.getDeviceToken());
+        User newUser = new User(userDto.getSsaid(), userDto.getDeviceToken(), userDto.getAlarmEnabled());
         userRepository.save(newUser);
     }
 }
