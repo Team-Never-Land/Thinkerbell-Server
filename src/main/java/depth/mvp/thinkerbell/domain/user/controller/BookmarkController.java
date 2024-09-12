@@ -82,4 +82,15 @@ public class BookmarkController {
 
         return ApiResult.ok(bookmarkService.getRecentSchedules(ssaid));
     }
+
+    @Operation(summary = "학사일정 즐겨찾기 전체 조회", description = "즐겨찾기 설정한 학사일정을 전체 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/schedule")
+    public ApiResult<List<?>> getAllMarkedSchedules(@RequestParam("ssaid") String ssaid) {
+        return ApiResult.ok(bookmarkService.getAllMarkedSchedules(ssaid));
+    }
 }

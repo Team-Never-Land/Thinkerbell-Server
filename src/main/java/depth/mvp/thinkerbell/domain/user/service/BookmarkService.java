@@ -554,4 +554,21 @@ public class BookmarkService {
         }
         return recentMarkedSchduleDtos;
     }
+
+    public List<MarkedScheduleDto> getAllMarkedSchedules(String ssaid) {
+        List<MarkedScheduleDto> markedSchduleDtos = new ArrayList<>();
+        User user = userRepository.findBySsaid(ssaid)
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserAndCategoryOrderByCreatedAtDesc(user,"AcademicSchedule");
+        for (Bookmark bookmark : bookmarks){
+            AcademicSchedule academicSchedule = academicScheduleRepository.findOneById(bookmark.getNoticeID());
+            markedSchduleDtos.add(MarkedScheduleDto.builder()
+                    .id(academicSchedule.getId())
+                    .title(academicSchedule.getTitle())
+                    .startDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[0])
+                    .endDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[1])
+                    .build());
+        }
+        return markedSchduleDtos;
+    }
 }
