@@ -3,7 +3,9 @@ package depth.mvp.thinkerbell.domain.user.service;
 import depth.mvp.thinkerbell.domain.notice.dto.*;
 import depth.mvp.thinkerbell.domain.notice.entity.*;
 import depth.mvp.thinkerbell.domain.notice.repository.*;
+import depth.mvp.thinkerbell.domain.notice.service.ScheduleParser;
 import depth.mvp.thinkerbell.domain.user.dto.RecentMarkedNoticeDto;
+import depth.mvp.thinkerbell.domain.user.dto.MarkedScheduleDto;
 import depth.mvp.thinkerbell.domain.user.entity.Bookmark;
 import depth.mvp.thinkerbell.domain.user.entity.User;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
@@ -39,6 +41,7 @@ public class BookmarkService {
     private final BiddingNoticeRepository biddingNoticeRepository;
     private final SafetyNoticeRepository safetyNoticeRepository;
     private final RevisionNoticeRepository revisionNoticeRepository;
+    private final AcademicScheduleRepository academicScheduleRepository;
 
     public List<Long> getBookmark(String ssaid, String category) {
         User user = userRepository.findBySsaid(ssaid)
@@ -534,4 +537,38 @@ public class BookmarkService {
         return recentMarkedNoticeDtos;
     }
 
+    public List<MarkedScheduleDto> getRecentSchedules(String ssaid) {
+        List<MarkedScheduleDto> recentMarkedSchduleDtos = new ArrayList<>();
+        User user = userRepository.findBySsaid(ssaid)
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+        List<Bookmark> bookmarks = bookmarkRepository.findTop3ByUserAndCategoryOrderByCreatedAtDesc(user,
+                "AcademicSchedule");
+        for (Bookmark bookmark : bookmarks){
+            AcademicSchedule academicSchedule = academicScheduleRepository.findOneById(bookmark.getNoticeID());
+            recentMarkedSchduleDtos.add(MarkedScheduleDto.builder()
+                    .id(academicSchedule.getId())
+                    .title(academicSchedule.getTitle())
+                    .startDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[0])
+                    .endDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[1])
+                    .build());
+        }
+        return recentMarkedSchduleDtos;
+    }
+
+    public List<MarkedScheduleDto> getAllMarkedSchedules(String ssaid) {
+        List<MarkedScheduleDto> markedSchduleDtos = new ArrayList<>();
+        User user = userRepository.findBySsaid(ssaid)
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserAndCategoryOrderByCreatedAtDesc(user,"AcademicSchedule");
+        for (Bookmark bookmark : bookmarks){
+            AcademicSchedule academicSchedule = academicScheduleRepository.findOneById(bookmark.getNoticeID());
+            markedSchduleDtos.add(MarkedScheduleDto.builder()
+                    .id(academicSchedule.getId())
+                    .title(academicSchedule.getTitle())
+                    .startDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[0])
+                    .endDate(ScheduleParser.parseDate(academicSchedule.getSchedule())[1])
+                    .build());
+        }
+        return markedSchduleDtos;
+    }
 }

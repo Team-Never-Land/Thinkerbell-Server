@@ -53,7 +53,7 @@ public class BookmarkController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @GetMapping("")
+    @GetMapping("/notice")
     public ApiResult<Map<String, List<?>>> getMarkedNotices(@RequestParam("ssaid") String ssaid) {
 
             return ApiResult.ok(bookmarkService.getMarkedNotices(ssaid));
@@ -65,9 +65,32 @@ public class BookmarkController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @GetMapping("/recent")
+    @GetMapping("/recent-notice")
     public ApiResult<List<?>> getRecentNotices(@RequestParam("ssaid") String ssaid) {
 
             return ApiResult.ok(bookmarkService.getRecentNotices(ssaid));
+    }
+
+    @Operation(summary = "학사일정 최근 즐겨찾기 3개 내역 조회", description = "즐겨찾기 설정한 최근 3개의 학사일정을 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/recent-schedule")
+    public ApiResult<List<?>> getRecentSchedules(@RequestParam("ssaid") String ssaid) {
+
+        return ApiResult.ok(bookmarkService.getRecentSchedules(ssaid));
+    }
+
+    @Operation(summary = "학사일정 즐겨찾기 전체 조회", description = "즐겨찾기 설정한 학사일정을 전체 조회합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/schedule")
+    public ApiResult<List<?>> getAllMarkedSchedules(@RequestParam("ssaid") String ssaid) {
+        return ApiResult.ok(bookmarkService.getAllMarkedSchedules(ssaid));
     }
 }
