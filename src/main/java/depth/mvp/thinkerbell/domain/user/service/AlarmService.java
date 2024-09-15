@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 import java.util.*;
 
@@ -258,6 +259,19 @@ public class AlarmService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public void deleteAlarm(String keyword, String SSAID, Long noticeID){
+        User user = userRepository.findBySsaid(SSAID)
+                .orElseThrow(() -> new IllegalArgumentException("주어진 ID로 사용자를 찾을 수 없습니다."));
+
+        Alarm alarm = alarmRepository.findByKeywordAndUserAndNoticeID(keyword, user, noticeID);
+
+        if (alarm == null) {
+            new NotFoundException("알림 내역을 찾을 수 없습니다.");
+        }
+
+        alarmRepository.deleteById(alarm.getId());
     }
 
     private Map<String, Object> getNoticeDetails(String tableName, Long noticeID) {
