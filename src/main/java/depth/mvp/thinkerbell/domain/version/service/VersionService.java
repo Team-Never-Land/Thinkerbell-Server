@@ -26,4 +26,17 @@ public class VersionService {
             throw new RuntimeException();
         }
     }
+
+    public void modifyNecessaryVersion(String versionCode, String versionName) {
+        Version version = Version.builder()
+                .versionCode(versionCode)
+                .versionName(versionName)
+                .build();
+        try {
+            versionRepository.delete(versionRepository.findOne());
+            versionRepository.save(version);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }
