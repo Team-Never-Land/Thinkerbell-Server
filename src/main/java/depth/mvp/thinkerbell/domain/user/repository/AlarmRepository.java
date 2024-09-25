@@ -13,6 +13,4 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     List<Alarm> findALLByUserIdAndKeyword (Long userId, String keyword);
 
-    Alarm findByKeywordAndUserAndNoticeID(String keyword, User user, Long noticeID);
-
 }
