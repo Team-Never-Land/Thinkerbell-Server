@@ -47,7 +47,7 @@ public class AlarmService {
     //전체 공지사항이 있는 뷰에서 키워드에 일치하는 공지를 찾아서 알람 테이블에 저장하는 기능
     //이때 최신으로 업데이트된 공지사항만 탐색한다.
     //알람 테이블에 저장되는 것들은 바로 fcm 알림까지 전송된다.
-    @Scheduled(cron = "0 0 19 * * ?", zone = "Asia/Seoul", fixedDelay = 60000)
+    @Scheduled(cron = "0 0 19 * * ?", zone = "Asia/Seoul")
     @Async
     public void updateNoticeAndMatchKeyword(){
         List<CrawlingNum> crawlingNums;
