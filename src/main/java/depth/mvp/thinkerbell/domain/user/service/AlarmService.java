@@ -47,7 +47,7 @@ public class AlarmService {
     //전체 공지사항이 있는 뷰에서 키워드에 일치하는 공지를 찾아서 알람 테이블에 저장하는 기능
     //이때 최신으로 업데이트된 공지사항만 탐색한다.
     //알람 테이블에 저장되는 것들은 바로 fcm 알림까지 전송된다.
-    @Scheduled(cron = "0 0 19 * * ?", zone = "Asia/Seoul", fixedDelay = 60000)
+    @Scheduled(cron = "0 0 19 * * ?", zone = "Asia/Seoul")
     @Async
     public void updateNoticeAndMatchKeyword(){
         List<CrawlingNum> crawlingNums;
@@ -89,28 +89,24 @@ public class AlarmService {
                 }
             }
 
-            //크롤링번호 최신화
-            try {
-                Long newMaxID = allNoticeViewRepository.findMaxIdByCategory(crawlingNum.getNoticeType());
+            Long newMaxID = allNoticeViewRepository.findMaxIdByCategory(crawlingNum.getNoticeType());
 
-                Optional<CrawlingNum> existingCrawlingNumOpt = crawlingNumRepository.findByNoticeType(crawlingNum.getNoticeType());
+            updateCrawlingNum(crawlingNum, newMaxID);
+        }
+    }
 
-                if (existingCrawlingNumOpt.isPresent()) {
-                    // 존재하는 경우 업데이트
-                    CrawlingNum existingCrawlingNum = existingCrawlingNumOpt.get();
-                    existingCrawlingNum.setNoticeID(newMaxID);
-                    crawlingNumRepository.save(existingCrawlingNum);
-                } else {
-                    // 존재하지 않는 경우 새로 저장
-                    CrawlingNum newCrawlingNum = CrawlingNum.builder()
-                            .noticeID(newMaxID)
-                            .noticeType(crawlingNum.getNoticeType())
-                            .build();
-                    crawlingNumRepository.save(newCrawlingNum);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(crawlingNum.getNoticeType() + "의 크롤링 번호를 업데이트 하는 도중 오류가 발생했습니다.", e);
-            }
+    public synchronized void updateCrawlingNum(CrawlingNum crawlingNum, Long newMaxID) {
+        Optional<CrawlingNum> existingCrawlingNumOpt = crawlingNumRepository.findByNoticeType(crawlingNum.getNoticeType());
+        if (existingCrawlingNumOpt.isPresent()) {
+            CrawlingNum existingCrawlingNum = existingCrawlingNumOpt.get();
+            existingCrawlingNum.setNoticeID(newMaxID);
+            crawlingNumRepository.save(existingCrawlingNum);
+        } else {
+            CrawlingNum newCrawlingNum = CrawlingNum.builder()
+                    .noticeID(newMaxID)
+                    .noticeType(crawlingNum.getNoticeType())
+                    .build();
+            crawlingNumRepository.save(newCrawlingNum);
         }
     }
 
