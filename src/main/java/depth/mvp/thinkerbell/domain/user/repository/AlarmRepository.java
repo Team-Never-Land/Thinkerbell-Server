@@ -1,6 +1,7 @@
 package depth.mvp.thinkerbell.domain.user.repository;
 
 import depth.mvp.thinkerbell.domain.user.entity.Alarm;
+import depth.mvp.thinkerbell.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

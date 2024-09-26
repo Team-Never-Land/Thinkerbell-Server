@@ -7,22 +7,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class KeywordDeleteService {
 
     private final KeywordRepository keywordRepository;
-
+    private final AlarmService alarmService;
     private final UserRepository userRepository;
 
     public Boolean isDeleted(String keyword, String userSSAID) {
-        User user = userRepository.findBySsaid(userSSAID)
-                .orElseThrow(() -> new IllegalArgumentException("주어진 ID로 사용자를 찾을 수 없습니다."));
 
-        keywordRepository.deleteByKeywordAndUserId(keyword, user.getId());
+        Optional<User> user = userRepository.findBySsaid(userSSAID);
+        User userEntity = user.get();
 
-        if (keywordRepository.existsByKeywordAndUserId(keyword, user.getId())) {
+        keywordRepository.deleteByKeywordAndUserId(keyword, userEntity.getId());
+        alarmService.deleteAlarm(keyword, userSSAID);
+
+        if (keywordRepository.existsByKeywordAndUserId(keyword, userEntity.getId())) {
             return false;
         } else {
             return true;
