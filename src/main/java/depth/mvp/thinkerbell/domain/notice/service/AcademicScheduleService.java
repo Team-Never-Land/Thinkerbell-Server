@@ -21,10 +21,16 @@ public class AcademicScheduleService {
     private final BookmarkService bookmarkService;
     private final AcademicScheduleRepository academicScheduleRepository;
 
-    public List<AcademicScheduleDto> getMonthlySchedule(int month, String ssaid) {
+    public List<AcademicScheduleDto> getMonthlySchedule(int month, int year, String ssaid) {
         // USER가 북마크한 내역(id리스트) 가져오기
         List<Long> bookmarkedNoticeIds = bookmarkService.getBookmark(ssaid,
                 this.getClass().getSimpleName().replace("Service", ""));
+
+        LocalDate currentDate = LocalDate.now();
+
+        if (currentDate.getYear() - 1 > year || currentDate.getYear() + 1 < year) {
+            throw new IllegalArgumentException("현재 년도의 +-1의 년도 사이만 입력가능합니다.");
+        }
 
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("1월 부터 12월 사이의 값을 입력해주세요");
@@ -35,14 +41,6 @@ public class AcademicScheduleService {
             if (schedules.isEmpty()) {
                 throw new MapperException(ErrorCode.INVALID_INPUT_VALUE);
             }
-
-//            return schedules.stream()
-//                    .map(AcademicScheduleMapper::toDto)
-//                    .filter(academicScheduleDto -> {
-//                        LocalDate localDate = academicScheduleDto.getStartDate();
-//                        return localDate != null && localDate.getMonthValue() == month;
-//                    })
-//                    .collect(Collectors.toList());
 
             return schedules.stream()
                     .map(schedule -> {
@@ -62,7 +60,7 @@ public class AcademicScheduleService {
                     })
                     .filter(academicScheduleDto -> {
                         LocalDate localDate = academicScheduleDto.getStartDate();
-                        return localDate != null && localDate.getMonthValue() == month;
+                        return localDate != null && localDate.getMonthValue() == month && localDate.getYear() == year;
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {

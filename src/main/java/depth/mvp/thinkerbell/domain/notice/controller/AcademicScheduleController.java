@@ -24,7 +24,7 @@ public class AcademicScheduleController {
 
     private final AcademicScheduleService academicScheduleService;
 
-    @Operation(summary = "학사 일정 조회", description = "주어진 월에 해당하는 학사 일정을 조회합니다.")
+    @Operation(summary = "학사 일정 조회", description = "주어진 월과 년도에 해당하는 학사 일정을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
@@ -32,11 +32,12 @@ public class AcademicScheduleController {
     })
     @GetMapping("/monthly")
     public ApiResult<List<AcademicScheduleDto>> getMonthlySchedule(
-            @Parameter(description = "조회할 월 (1~12)", required = true)
+            @Parameter(description = "조회할 월 (1~12)과 년도", required = true)
             @RequestParam int month,
+            @RequestParam int year,
             @RequestParam String ssaid) {
 
-            List<AcademicScheduleDto> schedules = academicScheduleService.getMonthlySchedule(month, ssaid);
+            List<AcademicScheduleDto> schedules = academicScheduleService.getMonthlySchedule(month, year, ssaid);
             return ApiResult.ok(schedules);
     }
 }
