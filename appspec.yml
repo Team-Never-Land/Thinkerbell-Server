@@ -17,9 +17,6 @@ hooks:
     - location: scripts/stop.sh
       timeout: 60
       runas: ubuntu
-    - location: scripts/set_env.sh
-      timeout: 300
-      runas: ubuntu
   ApplicationStart:
     - location: scripts/start.sh
       timeout: 60
