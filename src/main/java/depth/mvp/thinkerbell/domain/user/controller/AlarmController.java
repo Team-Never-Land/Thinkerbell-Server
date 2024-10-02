@@ -60,7 +60,7 @@ public class AlarmController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @GetMapping("/get")
+    @GetMapping("")
     public ApiResult<List<AlarmDto>> getAlarm(@RequestParam String SSAID, @RequestParam String keyword) {
             List<AlarmDto> alarms = alarmService.getAlarms(SSAID, keyword);
             return ApiResult.ok(alarms);
