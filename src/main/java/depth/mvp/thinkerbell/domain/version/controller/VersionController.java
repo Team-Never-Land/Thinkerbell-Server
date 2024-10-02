@@ -1,7 +1,9 @@
 package depth.mvp.thinkerbell.domain.version.controller;
 
+import com.google.api.client.util.Value;
 import depth.mvp.thinkerbell.domain.version.service.VersionService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
+import depth.mvp.thinkerbell.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class VersionController {
 
     private final VersionService versionService;
+    @Value("${ADMIN_SECRET_KEY}")
+    private static String ADMIN_SECRET_KEY;
 
     @Operation(summary = "최소 업데이트 필요 버전 조회", description = "최소 업데이트 필요 버전을 조회합니다.")
     @ApiResponses(value = {
@@ -30,13 +34,19 @@ public class VersionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 수정됨"),
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "403", description = "비밀 키 불일치"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @PatchMapping("")
-    public ApiResult<?> modifyNecessaryVersion(@RequestParam(required = false) String versionCode,
+    public ApiResult<?> modifyNecessaryVersion(@RequestHeader("X-Admin-Secret") String secretKey,
+                                               @RequestParam(required = false) String versionCode,
                                                @RequestParam(required = false) String versionName) {
-        versionService.modifyNecessaryVersion(versionCode, versionName);
-        return ApiResult.ok("성공적으로 수정됨");
+        if (ADMIN_SECRET_KEY.equals(secretKey)) {
+            versionService.modifyNecessaryVersion(versionCode, versionName);
+            return ApiResult.ok("성공적으로 수정됨");
+        } else {
+            return ApiResult.withError(ErrorCode.INVALUE_SECRET_KEY);
+        }
     }
 
 }
