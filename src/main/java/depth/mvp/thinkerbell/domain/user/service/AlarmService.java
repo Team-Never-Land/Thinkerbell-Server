@@ -14,6 +14,7 @@ import depth.mvp.thinkerbell.domain.user.repository.AlarmRepository;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
 import depth.mvp.thinkerbell.domain.user.repository.KeywordRepository;
 import depth.mvp.thinkerbell.domain.user.repository.UserRepository;
+import depth.mvp.thinkerbell.global.converter.CaseConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -224,7 +225,7 @@ public class AlarmService {
                             .id(alarm.getId())
                             .title(alarm.getTitle())
                             .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(alarm.getNoticeType())
+                            .noticeTypeEnglish(CaseConverter.snakeToPascal(alarm.getNoticeType()))
                             .isViewed(alarm.getIsViewed())
                             .isMarked(isMarked)
                             .Url(null)
@@ -242,7 +243,7 @@ public class AlarmService {
                             .id(alarm.getId())
                             .title(alarm.getTitle())
                             .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(alarm.getNoticeType())
+                            .noticeTypeEnglish(CaseConverter.snakeToPascal(alarm.getNoticeType()))
                             .isViewed(alarm.getIsViewed())
                             .isMarked(isMarked)
                             .Url(url)
