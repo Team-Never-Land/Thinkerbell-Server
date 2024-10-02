@@ -44,8 +44,14 @@ jobs:
           echo "${{ secrets.FIREBASE_KEY }}" | base64 --decode > src/main/resources/firebase/neverland-thinkerbell-firebase-adminsdk-n4ik2-49baee872c.json
           ls -l src/main/resources
           ls -l src/main/java/depth/mvp/thinkerbell/global/config
-
-    # (5) Gradle build (Test 제외)
+    
+    # (5) GitHub Secrets를 사용하여 환경변수 설정
+    - name: Set environment variables
+      run: |
+        echo "export ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }}" >> /home/ubuntu/.bash_profile
+        source /home/ubuntu/.bash_profile
+    
+    # (6) Gradle build (Test 제외)
     - name: Build with Gradle
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
@@ -53,7 +59,7 @@ jobs:
       env:
         CI: ""
 
-    # (6) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
+    # (7) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -61,7 +67,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
         aws-region: ${{ env.AWS_REGION }}
 
-    # (7) 빌드 결과물을 S3 버킷에 업로드
+    # (8) 빌드 결과물을 S3 버킷에 업로드
     - name: Upload to AWS S3
       run: |
         aws deploy push \
@@ -70,7 +76,7 @@ jobs:
           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
           --source .
 
-    # (8) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
+    # (9) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
     - name: Deploy to AWS EC2 from S3
       run: |
         aws deploy create-deployment \
