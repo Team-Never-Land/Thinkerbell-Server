@@ -1,6 +1,5 @@
 package depth.mvp.thinkerbell.domain.version.controller;
 
-import com.google.api.client.util.Value;
 import depth.mvp.thinkerbell.domain.version.service.VersionService;
 import depth.mvp.thinkerbell.global.dto.ApiResult;
 import depth.mvp.thinkerbell.global.exception.ErrorCode;
@@ -8,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
