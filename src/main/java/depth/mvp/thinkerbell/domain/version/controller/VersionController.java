@@ -17,7 +17,7 @@ public class VersionController {
 
     private final VersionService versionService;
     @Value("${ADMIN_SECRET_KEY}")
-    private static String ADMIN_SECRET_KEY;
+    private String ADMIN_SECRET_KEY;
 
     @Operation(summary = "최소 업데이트 필요 버전 조회", description = "최소 업데이트 필요 버전을 조회합니다.")
     @ApiResponses(value = {
