@@ -28,12 +28,11 @@ public class VersionService {
     }
 
     public void modifyNecessaryVersion(String versionCode, String versionName) {
-        Version version = Version.builder()
-                .versionCode(versionCode)
-                .versionName(versionName)
-                .build();
+        Version version = versionRepository.findOne();
+        if (versionCode != null) version.setVersionCode(versionCode);
+        if (versionName != null) version.setVersionName(versionName);
+
         try {
-            versionRepository.delete(versionRepository.findOne());
             versionRepository.save(version);
         } catch (Exception e) {
             throw new RuntimeException();

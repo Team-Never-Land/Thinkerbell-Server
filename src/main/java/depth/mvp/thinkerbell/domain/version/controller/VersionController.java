@@ -32,8 +32,9 @@ public class VersionController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
-    @PutMapping("")
-    public ApiResult<?> modifyNecessaryVersion(@RequestParam String versionCode, @RequestParam String versionName) {
+    @PatchMapping("")
+    public ApiResult<?> modifyNecessaryVersion(@RequestParam(required = false) String versionCode,
+                                               @RequestParam(required = false) String versionName) {
         versionService.modifyNecessaryVersion(versionCode, versionName);
         return ApiResult.ok("성공적으로 수정됨");
     }
