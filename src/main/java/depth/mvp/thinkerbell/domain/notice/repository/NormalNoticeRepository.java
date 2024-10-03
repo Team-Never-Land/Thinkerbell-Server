@@ -21,5 +21,5 @@ public interface NormalNoticeRepository  extends JpaRepository<NormalNotice, Lon
     List<NormalNotice> findAllByImportantTrueOrderByPubDateDesc();
     Page<NormalNotice> findAllByImportantFalseOrderByPubDateDesc(Pageable latestPageable);
     List<NormalNotice> findTop3ByOrderByPubDateDesc();
-
+    List<NormalNotice> findAllByImportantFalse();
 }

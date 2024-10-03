@@ -22,4 +22,6 @@ public interface DormitoryNoticeRepository extends JpaRepository<DormitoryNotice
     Page<DormitoryNotice> findAllByImportantFalseAndCampusOrderByPubDateDesc(Pageable pageable, @Param("campuses") List<String> campuses);
 
     DormitoryNotice findOneById(Long id);
+
+    List<DormitoryNotice> findAllByImportantFalse();
 }

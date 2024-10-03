@@ -22,4 +22,6 @@ public interface LibraryNoticeRepository extends JpaRepository<LibraryNotice, Lo
     Page<LibraryNotice> findAllByImportantFalseAndCampusOrderByPubDateDesc(Pageable pageable, @Param("campuses") List<String> campuses);
 
     LibraryNotice findOneById(Long noticeID);
+
+    List<LibraryNotice> findAllByImportantFalse();
 }

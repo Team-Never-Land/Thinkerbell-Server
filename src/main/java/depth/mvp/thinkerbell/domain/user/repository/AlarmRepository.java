@@ -11,6 +11,9 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     boolean existsByUserIdAndIsViewedFalse(Long userId);
 
+    List<Alarm> findALLByUserIdAndKeywordOrderById (Long userId, String keyword);
+
     List<Alarm> findALLByUserIdAndKeyword (Long userId, String keyword);
 
+    List<Alarm> findALLByNoticeTypeAndNoticeID (String noticeType, Long noticeID);
 }
