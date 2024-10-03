@@ -18,6 +18,17 @@ public class AlarmController {
 
     private final AlarmService alarmService;
 
+    @Operation(summary = "알림 기능 테스트", description = "사용자 SSAID와 키워드로 알림 기능을 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 확인됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 입력 값"),
+            @ApiResponse(responseCode = "500", description = "서버 오류 발생")
+    })
+    @GetMapping("/alarm-test")
+    public void testAlarm(@RequestParam String SSAID, @RequestParam String keyword) {
+        alarmService.updateNoticeAndMatchKeywordTest(SSAID, keyword);
+    }
+
     @Operation(summary = "키워드 별 미확인 알림 여부 확인", description = "사용자 SSAID와 키워드로 미확인 알림이 있는지 확인합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 확인됨"),
