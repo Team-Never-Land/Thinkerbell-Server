@@ -2,7 +2,6 @@ package depth.mvp.thinkerbell.domain.user.service;
 
 import depth.mvp.thinkerbell.domain.notice.entity.AllNoticesView;
 import depth.mvp.thinkerbell.domain.notice.repository.AllNoticeViewRepository;
-import depth.mvp.thinkerbell.domain.user.entity.Alarm;
 import depth.mvp.thinkerbell.domain.user.entity.Keyword;
 import depth.mvp.thinkerbell.domain.user.entity.User;
 import depth.mvp.thinkerbell.domain.user.repository.AlarmRepository;
@@ -34,16 +33,10 @@ public class KeywordSaveService {
 
         Optional<User> user = userRepository.findBySsaid(userID);
 
-        List<AllNoticesView> views = allNoticeViewRepository.findByTitleContainingKeyword(keywordWithoutSpaces);
 
         if (user.isPresent()) {
             User userEntity = user.get();
             keywordRepository.save(new Keyword(keywordWithoutSpaces, userEntity));
-
-            for (AllNoticesView allNoticesView : views) {
-                Alarm alarm = new Alarm(allNoticesView.getId(), allNoticesView.getTableName(), userEntity, allNoticesView.getTitle(), keyword);
-                alarmRepository.save(alarm);
-            }
 
             return true;
         } else {
