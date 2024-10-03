@@ -111,39 +111,19 @@ public class AlarmService {
         }
     }
 
-    public void updateNoticeAndMatchKeywordTest(){
-        List<CrawlingNum> crawlingNums;
+    public void updateNoticeAndMatchKeywordTest(String SSAID, String keyword){
+        String keywordWithoutSpace = keyword.replace(" ", "");
 
-        try {
-            crawlingNums = crawlingNumRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("크롤링 번호 레코드를 가져오는 동안 오류가 발생했습니다.", e);
-        }
+        List<AllNoticesView> allNoticesViews = allNoticeViewRepository.findByTitleContainingKeyword(keywordWithoutSpace);
 
-        for (CrawlingNum crawlingNum : crawlingNums) {
-            List<AllNoticesView> allNoticesViews;
+        User user = userRepository.findBySsaid(SSAID)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            try {
-                allNoticesViews = allNoticeViewRepository.findNewNoticesByCategory(crawlingNum.getNoticeType(), crawlingNum.getNoticeID());
+        for (AllNoticesView notice : allNoticesViews) {
+            Alarm alarm = new Alarm(notice.getId(), notice.getTableName(), user, notice.getTitle(), keyword);
 
-            } catch (Exception e) {
-                throw new RuntimeException(crawlingNum.getNoticeType() + "의 새로운 공지사항을 가져오는 중 오류가 발생했습니다.", e);
-            }
-
-            for (Keyword keyword : keywordRepository.findAll()) {
-                for (AllNoticesView notice : allNoticesViews) {
-                    String titleWithoutSpace = notice.getTitle().replace(" ", "");
-
-                    if (titleWithoutSpace.contains(keyword.getKeyword())) {
-                        try{
-                            Alarm alarm = new Alarm(notice.getId(), notice.getTableName(), keyword.getUser(), notice.getTitle(), keyword.getKeyword());
-
-                            fcmService.sendFCMMessage(alarm, keyword.getKeyword());
-                        } catch (Exception e) {
-                            throw new RuntimeException("유저 알림을 저장하거나, fcm 알림을 보내는 도중 오류가 발생했습니다.", e);
-                        }
-                    }
-                }
+            if (alarm.getUser().getAlarmEnabled()) {
+                fcmService.sendFCMMessage(alarm, keyword);
             }
         }
     }
@@ -203,7 +183,7 @@ public class AlarmService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            List<Alarm> alarms = alarmRepository.findALLByUserIdAndKeyword(user.getId(), keyword);
+            List<Alarm> alarms = alarmRepository.findALLByUserIdAndKeywordOrderById(user.getId(), keyword);
 
             List<AlarmDto> alarmDtos = new ArrayList<>();
 

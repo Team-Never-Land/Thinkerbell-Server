@@ -20,4 +20,6 @@ public interface TeachingNoticeRepository extends JpaRepository<TeachingNotice, 
     Page<TeachingNotice> findAllByImportantFalseOrderByPubDateDesc(Pageable pageable);
 
     TeachingNotice findOneById(Long noticeID);
+
+    List<TeachingNotice> findAllByImportantFalse();
 }

@@ -19,5 +19,5 @@ public interface AcademicNoticeRepository extends JpaRepository<AcademicNotice, 
     List<AcademicNotice> findAllByImportantTrueOrderByPubDateDesc();
     Page<AcademicNotice> findAllByImportantFalseOrderByPubDateDesc(Pageable latestPageable);
     List<AcademicNotice> findTop3ByOrderByPubDateDesc();
-
+    List<AcademicNotice> findAllByImportantFalse();
 }
