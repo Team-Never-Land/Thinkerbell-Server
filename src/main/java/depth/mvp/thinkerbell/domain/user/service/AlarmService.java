@@ -178,19 +178,21 @@ public class AlarmService {
     }
 
     //알림 키워드, 사용자 기반 조회
-    public List<AlarmDto> getAlarms(String SSAID, String keyword) {
+    public List<AlarmDto> getAlarms(String SSAID, String keyword){
         Optional<User> userOpt = userRepository.findBySsaid(SSAID);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
             List<Alarm> alarms = alarmRepository.findALLByUserIdAndKeywordOrderById(user.getId(), keyword);
+
             List<AlarmDto> alarmDtos = new ArrayList<>();
 
             for (Alarm alarm : alarms) {
                 String noticeType = categoryService.getCategoryUpper(alarm.getNoticeType());
 
                 List<Bookmark> bookmark = bookmarkRepository.findByCategoryAndUserAndNoticeID(noticeType, user, alarm.getNoticeID());
+
                 boolean isMarked = !bookmark.isEmpty();
 
                 Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
@@ -201,7 +203,7 @@ public class AlarmService {
                         .id(alarm.getId())
                         .title(alarm.getTitle())
                         .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                        .noticeTypeEnglish(alarm.getNoticeType())
+                        .noticeTypeEnglish(categoryService.getCategoryUpper(alarm.getNoticeType()))  // PascalCase로 변환
                         .isViewed(alarm.getIsViewed())
                         .isMarked(isMarked)
                         .Url(url)
