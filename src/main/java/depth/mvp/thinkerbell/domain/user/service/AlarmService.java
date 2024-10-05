@@ -14,6 +14,7 @@ import depth.mvp.thinkerbell.domain.user.repository.AlarmRepository;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
 import depth.mvp.thinkerbell.domain.user.repository.KeywordRepository;
 import depth.mvp.thinkerbell.domain.user.repository.UserRepository;
+import depth.mvp.thinkerbell.global.converter.CaseConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -177,7 +178,7 @@ public class AlarmService {
         alarm.setIsViewed(true);
     }
 
-    //알림 키워드, 사용자 기반 조회
+        //알림 키워드, 사용자 기반 조회
     public List<AlarmDto> getAlarms(String SSAID, String keyword){
         Optional<User> userOpt = userRepository.findBySsaid(SSAID);
 

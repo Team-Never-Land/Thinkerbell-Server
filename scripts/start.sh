@@ -9,6 +9,9 @@ DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
 
 TIME_NOW=$(date +%c)
 
+# AWS SSM Parameter Store에서 파라미터 가져오기
+export ADMIN_SECRET_KEY=$(aws ssm get-parameters --region ap-northeast-2 --names ADMIN_SECRET_KEY --query Parameters[0].Value | sed 's/"//g')
+
 # build 파일 복사
 echo "$TIME_NOW > $JAR_FILE 파일 복사" >> $DEPLOY_LOG
 cp $PROJECT_ROOT/build/libs/*.jar $JAR_FILE
