@@ -74,7 +74,9 @@ public class AlarmService {
 
                     if (titleWithoutSpace.contains(keyword.getKeyword())) {
                         try{
-                            Alarm alarm = new Alarm(notice.getId(), notice.getTableName(), keyword.getUser(), notice.getTitle(), keyword.getKeyword());
+                            String noticeType = categoryService.getCategoryUpper(notice.getTableName());
+
+                            Alarm alarm = new Alarm(notice.getId(), noticeType, keyword.getUser(), notice.getTitle(), keyword.getKeyword());
 
                             alarmRepository.save(alarm);
 
@@ -197,40 +199,24 @@ public class AlarmService {
                     isMarked = false;
                 }
 
-                if (Objects.equals(alarm.getNoticeType(), "job_training_notice")){
-                    String pubDate = getNoticeDetail(alarm.getNoticeType(), alarm.getNoticeID());
+                Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
 
-                    AlarmDto alarmDto = AlarmDto.builder()
-                            .id(alarm.getId())
-                            .title(alarm.getTitle())
-                            .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(alarm.getNoticeType())
-                            .isViewed(alarm.getIsViewed())
-                            .isMarked(isMarked)
-                            .Url(null)
-                            .pubDate(pubDate)
-                            .build();
+                String url = (String) noticeDetails.get("url");
+                String pubDate = (String) noticeDetails.get("pubDate");
 
-                    alarmDtos.add(alarmDto);
-                } else {
-                    Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
+                AlarmDto alarmDto = AlarmDto.builder()
+                        .id(alarm.getId())
+                        .title(alarm.getTitle())
+                        .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
+                        .noticeTypeEnglish(alarm.getNoticeType())
+                        .isViewed(alarm.getIsViewed())
+                        .isMarked(isMarked)
+                        .Url(url)
+                        .pubDate(pubDate)
+                        .build();
 
-                    String url = (String) noticeDetails.get("url");
-                    String pubDate = (String) noticeDetails.get("pubDate");
+                alarmDtos.add(alarmDto);
 
-                    AlarmDto alarmDto = AlarmDto.builder()
-                            .id(alarm.getId())
-                            .title(alarm.getTitle())
-                            .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(alarm.getNoticeType())
-                            .isViewed(alarm.getIsViewed())
-                            .isMarked(isMarked)
-                            .Url(url)
-                            .pubDate(pubDate)
-                            .build();
-
-                    alarmDtos.add(alarmDto);
-                }
             }
 
             return alarmDtos;
@@ -271,14 +257,5 @@ public class AlarmService {
         } else {
             return Collections.emptyMap();
         }
-    }
-
-    public String getNoticeDetail(String tableName, Long noticeID) {
-        String sql = "SELECT semester FROM " + tableName + " WHERE id = :noticeID";
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("noticeID", noticeID);
-
-        Object result = query.getSingleResult();
-        return result != null ? result.toString() : null;
     }
 }
