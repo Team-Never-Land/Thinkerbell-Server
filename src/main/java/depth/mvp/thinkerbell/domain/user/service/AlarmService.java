@@ -14,7 +14,6 @@ import depth.mvp.thinkerbell.domain.user.repository.AlarmRepository;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
 import depth.mvp.thinkerbell.domain.user.repository.KeywordRepository;
 import depth.mvp.thinkerbell.domain.user.repository.UserRepository;
-import depth.mvp.thinkerbell.global.converter.CaseConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -75,7 +74,9 @@ public class AlarmService {
 
                     if (titleWithoutSpace.contains(keyword.getKeyword())) {
                         try{
-                            Alarm alarm = new Alarm(notice.getId(), notice.getTableName(), keyword.getUser(), notice.getTitle(), keyword.getKeyword());
+                            String noticeType = categoryService.convertSnakeToPascal(notice.getTableName());
+
+                            Alarm alarm = new Alarm(notice.getId(), noticeType, keyword.getUser(), notice.getTitle(), keyword.getKeyword());
 
                             alarmRepository.save(alarm);
 
@@ -176,7 +177,7 @@ public class AlarmService {
         alarm.setIsViewed(true);
     }
 
-    //알림 키워드, 사용자 기반 조회
+        //알림 키워드, 사용자 기반 조회
     public List<AlarmDto> getAlarms(String SSAID, String keyword){
         Optional<User> userOpt = userRepository.findBySsaid(SSAID);
 
@@ -188,50 +189,28 @@ public class AlarmService {
             List<AlarmDto> alarmDtos = new ArrayList<>();
 
             for (Alarm alarm : alarms) {
-                String noticeType = categoryService.getCategoryUpper(alarm.getNoticeType());
+                String noticeType = categoryService.convertSnakeToPascal(alarm.getNoticeType());
 
                 List<Bookmark> bookmark = bookmarkRepository.findByCategoryAndUserAndNoticeID(noticeType, user, alarm.getNoticeID());
 
-                boolean isMarked = true;
+                boolean isMarked = !bookmark.isEmpty();
 
-                if (bookmark.isEmpty()) {
-                    isMarked = false;
-                }
+                Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
+                String url = (String) noticeDetails.get("url");
+                String pubDate = (String) noticeDetails.get("pubDate");
 
-                if (Objects.equals(alarm.getNoticeType(), "job_training_notice")){
-                    String pubDate = getNoticeDetail(alarm.getNoticeType(), alarm.getNoticeID());
+                AlarmDto alarmDto = AlarmDto.builder()
+                        .id(alarm.getId())
+                        .title(alarm.getTitle())
+                        .noticeTypeKorean(categoryService.convertEnglishToKorea(alarm.getNoticeType()))
+                        .noticeTypeEnglish(categoryService.convertSnakeToPascal(alarm.getNoticeType()))  // PascalCase로 변환
+                        .isViewed(alarm.getIsViewed())
+                        .isMarked(isMarked)
+                        .Url(url)
+                        .pubDate(pubDate)
+                        .build();
 
-                    AlarmDto alarmDto = AlarmDto.builder()
-                            .id(alarm.getId())
-                            .title(alarm.getTitle())
-                            .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(CaseConverter.snakeToPascal(alarm.getNoticeType()))
-                            .isViewed(alarm.getIsViewed())
-                            .isMarked(isMarked)
-                            .Url(null)
-                            .pubDate(pubDate)
-                            .build();
-
-                    alarmDtos.add(alarmDto);
-                } else {
-                    Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
-
-                    String url = (String) noticeDetails.get("url");
-                    String pubDate = (String) noticeDetails.get("pubDate");
-
-                    AlarmDto alarmDto = AlarmDto.builder()
-                            .id(alarm.getId())
-                            .title(alarm.getTitle())
-                            .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                            .noticeTypeEnglish(CaseConverter.snakeToPascal(alarm.getNoticeType()))
-                            .isViewed(alarm.getIsViewed())
-                            .isMarked(isMarked)
-                            .Url(url)
-                            .pubDate(pubDate)
-                            .build();
-
-                    alarmDtos.add(alarmDto);
-                }
+                alarmDtos.add(alarmDto);
             }
 
             return alarmDtos;
@@ -272,14 +251,5 @@ public class AlarmService {
         } else {
             return Collections.emptyMap();
         }
-    }
-
-    public String getNoticeDetail(String tableName, Long noticeID) {
-        String sql = "SELECT semester FROM " + tableName + " WHERE id = :noticeID";
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("noticeID", noticeID);
-
-        Object result = query.getSingleResult();
-        return result != null ? result.toString() : null;
     }
 }

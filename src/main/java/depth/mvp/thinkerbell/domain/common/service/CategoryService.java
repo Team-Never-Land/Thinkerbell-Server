@@ -16,11 +16,11 @@ public class CategoryService {
     private Map<String, String> categoryMap2;
 
     public CategoryService() {
-        loadCategoryMap();
-        upperCategoryMap();
+        convertJsonKeysEnglishToKorea();
+        convertJsonKeysSnakeToPascal();
     }
 
-    private void loadCategoryMap() {
+    private void convertJsonKeysEnglishToKorea() {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try(InputStream inputStream = new ClassPathResource("Categories.json").getInputStream()) {
@@ -30,7 +30,7 @@ public class CategoryService {
         }
     }
 
-    private void upperCategoryMap() {
+    private void convertJsonKeysSnakeToPascal() {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try(InputStream inputStream = new ClassPathResource("Category.json").getInputStream()) {
@@ -40,10 +40,11 @@ public class CategoryService {
         }
     }
 
-    public String getCategoryNameInKorean(String category) {
+    public String convertEnglishToKorea(String category) {
         return categoryMap1.getOrDefault(category, category);
     }
-    public String getCategoryUpper(String category) {
+
+    public String convertSnakeToPascal(String category) {
         return categoryMap2.getOrDefault(category, category);
     }
 }
