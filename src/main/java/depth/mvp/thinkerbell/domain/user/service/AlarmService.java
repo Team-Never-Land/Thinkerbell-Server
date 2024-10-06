@@ -14,7 +14,6 @@ import depth.mvp.thinkerbell.domain.user.repository.AlarmRepository;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
 import depth.mvp.thinkerbell.domain.user.repository.KeywordRepository;
 import depth.mvp.thinkerbell.domain.user.repository.UserRepository;
-import depth.mvp.thinkerbell.global.converter.CaseConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -75,7 +74,7 @@ public class AlarmService {
 
                     if (titleWithoutSpace.contains(keyword.getKeyword())) {
                         try{
-                            String noticeType = categoryService.getCategoryUpper(notice.getTableName());
+                            String noticeType = categoryService.convertSnakeToPascal(notice.getTableName());
 
                             Alarm alarm = new Alarm(notice.getId(), noticeType, keyword.getUser(), notice.getTitle(), keyword.getKeyword());
 
@@ -190,7 +189,7 @@ public class AlarmService {
             List<AlarmDto> alarmDtos = new ArrayList<>();
 
             for (Alarm alarm : alarms) {
-                String noticeType = categoryService.getCategoryUpper(alarm.getNoticeType());
+                String noticeType = categoryService.convertSnakeToPascal(alarm.getNoticeType());
 
                 List<Bookmark> bookmark = bookmarkRepository.findByCategoryAndUserAndNoticeID(noticeType, user, alarm.getNoticeID());
 
@@ -203,8 +202,8 @@ public class AlarmService {
                 AlarmDto alarmDto = AlarmDto.builder()
                         .id(alarm.getId())
                         .title(alarm.getTitle())
-                        .noticeTypeKorean(categoryService.getCategoryNameInKorean(alarm.getNoticeType()))
-                        .noticeTypeEnglish(categoryService.getCategoryUpper(alarm.getNoticeType()))  // PascalCase로 변환
+                        .noticeTypeKorean(categoryService.convertEnglishToKorea(alarm.getNoticeType()))
+                        .noticeTypeEnglish(categoryService.convertSnakeToPascal(alarm.getNoticeType()))  // PascalCase로 변환
                         .isViewed(alarm.getIsViewed())
                         .isMarked(isMarked)
                         .Url(url)
