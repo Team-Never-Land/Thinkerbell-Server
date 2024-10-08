@@ -219,13 +219,13 @@ public class AlarmService {
             List<AlarmDto> alarmDtos = new ArrayList<>();
 
             for (Alarm alarm : alarms) {
-                String noticeType = categoryService.convertSnakeToPascal(alarm.getNoticeType());
+                String noticeType = alarm.getNoticeType();
 
                 List<Bookmark> bookmark = bookmarkRepository.findByCategoryAndUserAndNoticeID(noticeType, user, alarm.getNoticeID());
 
                 boolean isMarked = !bookmark.isEmpty();
 
-                Map<String, Object> noticeDetails = getNoticeDetails(alarm.getNoticeType(), alarm.getNoticeID());
+                Map<String, Object> noticeDetails = getNoticeDetails(categoryService.convertPascalToSnake(noticeType), alarm.getNoticeID());
                 String url = (String) noticeDetails.get("url");
                 String pubDate = (String) noticeDetails.get("pubDate");
 
