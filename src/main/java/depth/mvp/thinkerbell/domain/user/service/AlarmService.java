@@ -1,10 +1,13 @@
 package depth.mvp.thinkerbell.domain.user.service;
 
 import depth.mvp.thinkerbell.domain.common.service.CategoryService;
+import depth.mvp.thinkerbell.domain.notice.entity.AcademicSchedule;
 import depth.mvp.thinkerbell.domain.notice.entity.AllNoticesView;
 import depth.mvp.thinkerbell.domain.notice.entity.CrawlingNum;
+import depth.mvp.thinkerbell.domain.notice.repository.AcademicScheduleRepository;
 import depth.mvp.thinkerbell.domain.notice.repository.AllNoticeViewRepository;
 import depth.mvp.thinkerbell.domain.notice.repository.CrawlingNumRepository;
+import depth.mvp.thinkerbell.domain.notice.service.ScheduleParser;
 import depth.mvp.thinkerbell.domain.user.dto.AlarmDto;
 import depth.mvp.thinkerbell.domain.user.entity.Alarm;
 import depth.mvp.thinkerbell.domain.user.entity.Bookmark;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -36,6 +40,7 @@ public class AlarmService {
     private EntityManager entityManager;
 
     private final AllNoticeViewRepository allNoticeViewRepository;
+    private final AcademicScheduleRepository academicScheduleRepository;
     private final KeywordRepository keywordRepository;
     private final CrawlingNumRepository crawlingNumRepository;
     private final AlarmRepository alarmRepository;
@@ -96,6 +101,31 @@ public class AlarmService {
             updateCrawlingNum(crawlingNum, newMaxID);
         }
     }
+
+    //매일 오전 8시에 학사일정 알림 전송
+    @Scheduled(cron = "0 0 8 * * ?", zone = "Asia/Seoul")
+    public void sendAlarmForBookmarkSchedule(){
+        List<User> userList = userRepository.findAll();
+        LocalDate currentDate = LocalDate.now();
+
+        for (User user : userList) {
+            List<Bookmark> bookmarkList = bookmarkRepository.findByUserAndCategoryOrderByCreatedAtDesc(user, "AcademicSchedule");;
+
+            if (bookmarkList != null) {
+                for (Bookmark bookmark : bookmarkList) {
+                    AcademicSchedule academicSchedule = academicScheduleRepository.findOneById(bookmark.getNoticeID());
+
+                    if (academicSchedule != null) {
+                        if (currentDate.isEqual(ScheduleParser.parseDate(academicSchedule.getSchedule())[0])){
+                            fcmService.sendScheduleMessage(user, academicSchedule.getTitle());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
     public synchronized void updateCrawlingNum(CrawlingNum crawlingNum, Long newMaxID) {
         Optional<CrawlingNum> existingCrawlingNumOpt = crawlingNumRepository.findByNoticeType(crawlingNum.getNoticeType());
