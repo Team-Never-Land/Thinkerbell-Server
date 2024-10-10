@@ -28,7 +28,7 @@ public class CareerNoticeService {
 
     public PaginationDTO<CareerNoticeDTO> getAllCareerNotices(int page, int size, String ssaid) throws NotFoundException {
         Pageable pageable = PageRequest.of(page, size);
-        Page<CareerNotice> resultPage = careerNoticeRepository.findAll(pageable);
+        Page<CareerNotice> resultPage = careerNoticeRepository.findAllByOrderByPubDateDesc(pageable);
 
         List<Long> bookmarkedNoticeIds = bookmarkService.getBookmark(ssaid,
                 this.getClass().getSimpleName().replace("Service", ""));
