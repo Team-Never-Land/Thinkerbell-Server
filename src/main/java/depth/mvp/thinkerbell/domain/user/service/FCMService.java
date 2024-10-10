@@ -41,7 +41,7 @@ public class FCMService {
         try{
             String cutTitle = cutTitle(title, 40);
 
-            String messageBody = String.format("띵~🔔 즐겨찾기한 학사일정이(가) 시작됐어요!\n%s",
+            String messageBody = String.format("띵~🔔 즐겨찾기한 학사일정이 시작됐어요!\n%s",
                     cutTitle);
 
             Message message = Message.builder()
