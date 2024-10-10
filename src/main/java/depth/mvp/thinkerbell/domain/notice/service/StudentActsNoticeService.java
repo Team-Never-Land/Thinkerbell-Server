@@ -29,7 +29,7 @@ public class StudentActsNoticeService {
 
     public PaginationDTO<StudentActsNoticeDTO> getAllStudentActsNotices(int page, int size, String ssaid) throws NotFoundException {
         Pageable pageable = PageRequest.of(page, size);
-        Page<StudentActsNotice> resultPage = studentActsNoticeRepository.findAll(pageable);
+        Page<StudentActsNotice> resultPage = studentActsNoticeRepository.findAllByOrderByPubDateDesc(pageable);
 
         List<Long> bookmarkedNoticeIds = bookmarkService.getBookmark(ssaid,
                 this.getClass().getSimpleName().replace("Service", ""));

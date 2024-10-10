@@ -28,7 +28,7 @@ public class BiddingNoticeService {
 
     public PaginationDTO<BiddingNoticeDTO> getAllBiddingNotices(int page, int size, String ssaid) throws NotFoundException {
         Pageable pageable = PageRequest.of(page, size);
-        Page<BiddingNotice> resultPage = biddingNoticeRepository.findAll(pageable);
+        Page<BiddingNotice> resultPage = biddingNoticeRepository.findAllByOrderByPubDateDesc(pageable);
 
         List<Long> bookmarkedNoticeIds = bookmarkService.getBookmark(ssaid,
                 this.getClass().getSimpleName().replace("Service", ""));
