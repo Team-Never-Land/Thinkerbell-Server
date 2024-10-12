@@ -29,9 +29,10 @@ public class NoticeSearchController {
     })
     @GetMapping("/search")
     public ApiResult<Map<String, List<?>>> searchNotices(@RequestParam String keyword,
-                                                         @RequestParam String ssaid) {
+                                                         @RequestParam String ssaid,
+                                                         @RequestParam String noticeType) {
 
-            Map<String, List<?>> notices = noticeSearchService.searchNotices(keyword, ssaid);
+            Map<String, List<?>> notices = noticeSearchService.searchNotices(keyword, ssaid, noticeType);
             return ApiResult.ok(notices);
     }
 
