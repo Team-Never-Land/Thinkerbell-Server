@@ -2,17 +2,14 @@ package depth.mvp.thinkerbell.domain.notice.service;
 
 import depth.mvp.thinkerbell.domain.notice.dto.*;
 import depth.mvp.thinkerbell.domain.notice.repository.*;
-import depth.mvp.thinkerbell.domain.user.entity.Bookmark;
 import depth.mvp.thinkerbell.domain.user.entity.User;
 import depth.mvp.thinkerbell.domain.user.repository.BookmarkRepository;
 import depth.mvp.thinkerbell.domain.user.repository.UserRepository;
-import depth.mvp.thinkerbell.domain.user.service.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
-import java.awt.print.Book;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +37,98 @@ public class NoticeSearchService {
     private final RevisionNoticeRepository revisionNoticeRepository;
 
 
-    public Map<String, List<?>> searchNotices(String keyword, String ssaid) {
+    public Map<String, List<?>> searchNotices(String keyword, String ssaid, String noticeType) {
+        // 특수기호/이모지 필터링 로직 추가
+        if (!keyword.matches("^[가-힣a-zA-Z0-9]+$")) {
+            throw new IllegalArgumentException("키워드에는 특수기호나 이모지를 사용할 수 없습니다.");
+        }
+
         Map<String, List<?>> result = new HashMap<>();
         // USER가 북마크한 내역(id리스트) 가져오기
         User user = userRepository.findBySsaid(ssaid)
                 .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
-        // DormitoryEntryNotice 검색 및 DTO 변환
-        List<DormitoryEntryNoticeDTO> dormitoryEntryNotices = dormitoryEntryNoticeRepository.searchByTitle(keyword)
+        // noticeType에 따른 공지 검색
+        if (noticeType == null || noticeType.equals("AllNotice")) {
+            // 전체 공지 검색
+            result.putAll(searchAllNotices(keyword, user));
+        } else {
+            // 카테고리별 공지 검색
+            switch (noticeType) {
+                case "DormitoryEntryNotice":
+                    result.put("DormitoryEntryNotice", searchDormitoryEntryNotices(keyword, user));
+                    break;
+                case "DormitoryNotice":
+                    result.put("DormitoryNotice", searchDormitoryNotices(keyword, user));
+                    break;
+                case "LibraryNotice":
+                    result.put("LibraryNotice", searchLibraryNotices(keyword, user));
+                    break;
+                case "AcademicNotice":
+                    result.put("AcademicNotice", searchAcademicNotices(keyword, user));
+                    break;
+                case "JobTrainingNotice":
+                    result.put("JobTrainingNotice", searchJobTrainingNotices(keyword, user));
+                    break;
+                case "NormalNotice":
+                    result.put("NormalNotice", searchNormalNotices(keyword, user));
+                    break;
+                case "EventNotice":
+                    result.put("EventNotice", searchEventNotices(keyword, user));
+                    break;
+                case "CareerNotice":
+                    result.put("CareerNotice", searchCareerNotices(keyword, user));
+                    break;
+                case "ScholarshipNotice":
+                    result.put("ScholarshipNotice", searchScholarshipNotices(keyword, user));
+                    break;
+                case "StudentActsNotice":
+                    result.put("StudentActsNotice", searchStudentActsNotices(keyword, user));
+                    break;
+                case "BiddingNotice":
+                    result.put("BiddingNotice", searchBiddingNotices(keyword, user));
+                    break;
+                case "SafetyNotice":
+                    result.put("SafetyNotice", searchSafetyNotices(keyword, user));
+                    break;
+                case "RevisionNotice":
+                    result.put("RevisionNotice", searchRevisionNotices(keyword, user));
+                    break;
+                case "TeachingNotice":
+                    result.put("TeachingNotice", searchTeachingNotices(keyword, user));
+                    break;
+                default:
+                    throw new IllegalArgumentException("잘못된 noticeType 값입니다.");
+            }
+        }
+        return result;
+    }
+
+
+    private Map<String, List<?>> searchAllNotices(String keyword, User user) {
+        Map<String, List<?>> result = new HashMap<>();
+
+        // 각 카테고리별 검색 결과를 모두 병합
+        result.put("DormitoryEntryNotice", searchDormitoryEntryNotices(keyword, user));
+        result.put("DormitoryNoticeRepository", searchDormitoryNotices(keyword, user));
+        result.put("LibraryNotice", searchLibraryNotices(keyword, user));
+        result.put("TeachingNotice", searchTeachingNotices(keyword, user));
+        result.put("AcademicNotice", searchAcademicNotices(keyword, user));
+        result.put("JobTrainingNotice", searchJobTrainingNotices(keyword, user));
+        result.put("NormalNotice", searchNormalNotices(keyword, user));
+        result.put("EventNotice", searchEventNotices(keyword, user));
+        result.put("CareerNotice", searchCareerNotices(keyword, user));
+        result.put("ScholarshipNotice", searchScholarshipNotices(keyword, user));
+        result.put("StudentActsNotice", searchStudentActsNotices(keyword, user));
+        result.put("BiddingNotice", searchBiddingNotices(keyword, user));
+        result.put("SafetyNotice", searchSafetyNotices(keyword, user));
+        result.put("RevisionNotice", searchRevisionNotices(keyword, user));
+
+        return result;
+    }
+
+    private List<DormitoryEntryNoticeDTO> searchDormitoryEntryNotices(String keyword, User user) {
+        return dormitoryEntryNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -63,12 +144,10 @@ public class NoticeSearchService {
                             .build();
                 })
                 .collect(Collectors.toList());
-        if (!dormitoryEntryNotices.isEmpty()) {
-            result.put("DormitoryEntryNotice", dormitoryEntryNotices);
-        }
+    }
 
-        // DormitoryNotice 검색 및 DTO 변환
-        List<DormitoryNoticeDTO> dormitoryNotices = dormitoryNoticeRepository.searchByTitle(keyword)
+    private List<DormitoryNoticeDTO> searchDormitoryNotices(String keyword, User user) {
+        return dormitoryNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -84,13 +163,10 @@ public class NoticeSearchService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
 
-        if (!dormitoryNotices.isEmpty()) {
-            result.put("DormitoryNotice", dormitoryNotices);
-        }
-
-        // LibraryNotice 검색 및 DTO 변환
-        List<LibraryNoticeDTO> libraryNotices = libraryNoticeRepository.searchByTitle(keyword)
+    private List<LibraryNoticeDTO> searchLibraryNotices(String keyword, User user) {
+        return libraryNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -106,13 +182,10 @@ public class NoticeSearchService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
 
-        if (!libraryNotices.isEmpty()) {
-            result.put("LibraryNotice", libraryNotices);
-        }
-
-       //  TeachingNotice 검색 및 DTO 변환
-        List<TeachingNoticeDTO> teachingNotices = teachingNoticeRepository.searchByTitle(keyword)
+    private List<TeachingNoticeDTO> searchTeachingNotices(String keyword, User user) {
+        return teachingNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -127,17 +200,34 @@ public class NoticeSearchService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
 
-        if (!teachingNotices.isEmpty()) {
-            result.put("TeachingNotice", teachingNotices);
-        }
 
-        // JobTrainingNotice 검색 및 DTO 변환
-        List<JobTrainingNoticeDTO> jobTrainingNotices = jobTrainingNoticeRepository.searchByTitleOrMajor(keyword)
+    private List<AcademicNoticeDTO> searchAcademicNotices(String keyword, User user) {
+        return academicNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
-                            "JobTrainingNotice", notice.getId(), user);                    return JobTrainingNoticeDTO.builder()
+                            "AcademicNotice", notice.getId(), user);
+                    return AcademicNoticeDTO.builder()
+                            .id(notice.getId())
+                            .pubDate(notice.getPubDate())
+                            .title(notice.getTitle())
+                            .url(notice.getUrl())
+                            .marked(isMarked)
+                            .important(notice.isImportant())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<JobTrainingNoticeDTO> searchJobTrainingNotices(String keyword, User user) {
+        return jobTrainingNoticeRepository.searchByTitleOrMajor(keyword)
+                .stream()
+                .map(notice -> {
+                    boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
+                            "JobTrainingNotice", notice.getId(), user);
+                    return JobTrainingNoticeDTO.builder()
                             .id(notice.getId())
                             .company(notice.getCompany())
                             .year(notice.getYear())
@@ -151,13 +241,10 @@ public class NoticeSearchService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
 
-        if (!jobTrainingNotices.isEmpty()) {
-            result.put("JobTrainingNotice", jobTrainingNotices);
-        }
-
-        // NormalNotice 검색 및 DTO 변환
-        List<NormalNoticeDTO> normalNotices = normalNoticeRepository.searchByTitle(keyword)
+    private List<NormalNoticeDTO> searchNormalNotices(String keyword, User user) {
+        return normalNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -171,32 +258,10 @@ public class NoticeSearchService {
                             .important(notice.isImportant())
                             .build();
                 }).collect(Collectors.toList());
-        if (!normalNotices.isEmpty()) {
-            result.put("NormalNotice", normalNotices);
-        }
+    }
 
-        // AcademicNotice 검색 및 DTO 변환
-        List<AcademicNoticeDTO> academicNotices = academicNoticeRepository.searchByTitle(keyword)
-                .stream()
-                .map(notice -> {
-                    boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
-                            "AcademicNotice", notice.getId(), user);
-                    return AcademicNoticeDTO.builder()
-                            .id(notice.getId())
-                            .pubDate(notice.getPubDate())
-                            .title(notice.getTitle())
-                            .url(notice.getUrl())
-                            .marked(isMarked)
-                            .important(notice.isImportant())
-                            .build();
-                }).collect(Collectors.toList());
-
-        if (!academicNotices.isEmpty()) {
-            result.put("AcademicNotice", academicNotices);
-        }
-
-        // EventNotice 검색 및 DTO 변환
-        List<EventNoticeDTO> eventNotices = eventNoticeRepository.searchByTitle(keyword)
+    private List<EventNoticeDTO> searchEventNotices(String keyword, User user) {
+        return eventNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -209,13 +274,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!eventNotices.isEmpty()) {
-            result.put("EventNotice", eventNotices);
-        }
-
-        // CareerNotice 검색 및 DTO 변환
-        List<CareerNoticeDTO> careerNotices = careerNoticeRepository.searchByTitle(keyword)
+    private List<CareerNoticeDTO> searchCareerNotices(String keyword, User user) {
+        return careerNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -228,13 +290,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!careerNotices.isEmpty()) {
-            result.put("CareerNotice", careerNotices);
-        }
-
-        // ScholarshipNotice 검색 및 DTO 변환
-        List<ScholarshipNoticeDTO> scholarshipNotices = scholarshipNoticeRepository.searchByTitle(keyword)
+    private List<ScholarshipNoticeDTO> searchScholarshipNotices(String keyword, User user) {
+        return scholarshipNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -247,13 +306,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!scholarshipNotices.isEmpty()) {
-            result.put("ScholarshipNotices", scholarshipNotices);
-        }
-
-        // StudentActsNotice 검색 및 DTO 변환
-        List<StudentActsNoticeDTO> studentActsNotices = studentActsNoticeRepository.searchByTitle(keyword)
+    private List<StudentActsNoticeDTO> searchStudentActsNotices(String keyword, User user) {
+        return studentActsNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -266,13 +322,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!studentActsNotices.isEmpty()) {
-            result.put("StudentActsNotice", studentActsNotices);
-        }
-
-        // BiddingNotice 검색 및 DTO 변환
-        List<BiddingNoticeDTO> biddingNotices = biddingNoticeRepository.searchByTitle(keyword)
+    private List<BiddingNoticeDTO> searchBiddingNotices(String keyword, User user) {
+        return biddingNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -285,13 +338,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!biddingNotices.isEmpty()) {
-            result.put("BiddingNotice", biddingNotices);
-        }
-
-        // SafetyNotice 검색 및 DTO 변환
-        List<SafetyNoticeDTO> safetyNotices = safetyNoticeRepository.searchByTitle(keyword)
+    private List<SafetyNoticeDTO> searchSafetyNotices(String keyword, User user) {
+        return safetyNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -304,13 +354,10 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
+    }
 
-        if (!safetyNotices.isEmpty()) {
-            result.put("SafetyNotice", safetyNotices);
-        }
-
-        // RevisionNotice 검색 및 DTO 변환
-        List<RevisionNoticeDTO> revisionNotices = revisionNoticeRepository.searchByTitle(keyword)
+    private List<RevisionNoticeDTO> searchRevisionNotices(String keyword, User user) {
+        return revisionNoticeRepository.searchByTitle(keyword)
                 .stream()
                 .map(notice -> {
                     boolean isMarked = bookmarkRepository.existsByCategoryAndNoticeIDAndUser(
@@ -323,13 +370,9 @@ public class NoticeSearchService {
                             .marked(isMarked)
                             .build();
                 }).collect(Collectors.toList());
-
-        if (!revisionNotices.isEmpty()) {
-            result.put("RevisionNotice", revisionNotices);
-        }
-
-        return result;
     }
+
+
 
     public Map<String, List<?>> getRecentNotices(String ssaid) {
         Map<String, List<?>> result = new HashMap<>();
