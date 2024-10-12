@@ -5,6 +5,7 @@ import depth.mvp.thinkerbell.global.dto.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +29,10 @@ public class NoticeSearchController {
             @ApiResponse(responseCode = "500", description = "서버 오류 발생")
     })
     @GetMapping("/search")
-    public ApiResult<Map<String, List<?>>> searchNotices(@RequestParam String keyword,
-                                                         @RequestParam String ssaid) {
+    public ApiResult<Map<String, List<?>>> searchNotices(@RequestParam  @Size(min = 2, max = 9, message = "키워드는 2글자 이상, 9글자 이하만 가능합니다.") String keyword,
+                                                         @RequestParam String ssaid, @RequestParam String noticeType) {
 
-            Map<String, List<?>> notices = noticeSearchService.searchNotices(keyword, ssaid);
+            Map<String, List<?>> notices = noticeSearchService.searchNotices(keyword, ssaid, noticeType);
             return ApiResult.ok(notices);
     }
 
