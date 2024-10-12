@@ -38,6 +38,11 @@ public class NoticeSearchService {
 
 
     public Map<String, List<?>> searchNotices(String keyword, String ssaid, String noticeType) {
+        // 키워드 길이 예외 처리
+        if (keyword.length() < 2 || keyword.length() > 9) {
+            throw new IllegalArgumentException("키워드는 2글자 이상, 9글자 이하만 가능합니다.");
+        }
+
         // 특수기호/이모지 필터링 로직 추가
         if (!keyword.matches("^[가-힣a-zA-Z0-9]+$")) {
             throw new IllegalArgumentException("키워드에는 특수기호나 이모지를 사용할 수 없습니다.");
@@ -49,7 +54,7 @@ public class NoticeSearchService {
                 .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
         // noticeType에 따른 공지 검색
-        if (noticeType == null || noticeType.equals("AllNotice")) {
+        if (noticeType.equals("AllNotice")) {
             // 전체 공지 검색
             result.putAll(searchAllNotices(keyword, user));
         } else {
