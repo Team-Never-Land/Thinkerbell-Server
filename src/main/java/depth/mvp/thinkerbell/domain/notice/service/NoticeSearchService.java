@@ -39,8 +39,8 @@ public class NoticeSearchService {
 
     public Map<String, List<?>> searchNotices(String keyword, String ssaid, String noticeType) {
         // 키워드 길이 예외 처리
-        if (keyword.length() < 2 || keyword.length() > 9) {
-            throw new IllegalArgumentException("키워드는 2글자 이상, 9글자 이하만 가능합니다.");
+        if (keyword.length() < 2 || keyword.length() > 12) {
+            throw new IllegalArgumentException("키워드는 2글자 이상, 12글자 이하만 가능합니다.");
         }
 
         // 특수기호/이모지 필터링 로직 추가
