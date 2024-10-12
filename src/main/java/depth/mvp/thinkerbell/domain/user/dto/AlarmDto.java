@@ -9,6 +9,7 @@ import lombok.*;
 public class AlarmDto {
 
     private Long id;
+    private Long categoryId;
     private String title;
     private String noticeTypeKorean;
     private String noticeTypeEnglish;

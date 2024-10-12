@@ -231,6 +231,7 @@ public class AlarmService {
 
                 AlarmDto alarmDto = AlarmDto.builder()
                         .id(alarm.getId())
+                        .categoryId(alarm.getNoticeID())
                         .title(alarm.getTitle())
                         .noticeTypeKorean(categoryService.convertEnglishToKorea(alarm.getNoticeType()))
                         .noticeTypeEnglish(categoryService.convertSnakeToPascal(alarm.getNoticeType()))  // PascalCase로 변환
