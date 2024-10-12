@@ -31,7 +31,7 @@ public class RevisionNoticeService {
 
     public PaginationDTO<RevisionNoticeDTO> getAllRevisionNotices(int page, int size, String ssaid) throws NotFoundException {
         Pageable pageable = PageRequest.of(page, size);
-        Page<RevisionNotice> resultPage = revisionNoticeRepository.findAll(pageable);
+        Page<RevisionNotice> resultPage = revisionNoticeRepository.findAllByOrderByPubDateDesc(pageable);
 
         List<Long> bookmarkedNoticeIds = bookmarkService.getBookmark(ssaid,
                 this.getClass().getSimpleName().replace("Service", ""));

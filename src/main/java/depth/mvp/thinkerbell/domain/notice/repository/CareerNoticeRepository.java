@@ -17,5 +17,5 @@ public interface CareerNoticeRepository extends JpaRepository<CareerNotice, Long
     List<CareerNotice> searchByTitle(@Param("keyword") String keyword);
     CareerNotice findOneById(Long noticeID);
     List<CareerNotice> findTop3ByOrderByPubDateDesc();
-
+    Page<CareerNotice> findAllByOrderByPubDateDesc(Pageable pageable);
 }
