@@ -22,6 +22,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,8 @@ public class AlarmService {
     private final FCMService fcmService;
     private final CategoryService categoryService;
     private final BookmarkRepository bookmarkRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(AlarmService.class);
 
     //전체 공지사항이 있는 뷰에서 키워드에 일치하는 공지를 찾아서 알람 테이블에 저장하는 기능
     //이때 최신으로 업데이트된 공지사항만 탐색한다.
@@ -86,7 +90,13 @@ public class AlarmService {
                             alarmRepository.save(alarm);
 
                             if (alarm.getUser().getAlarmEnabled()) {
-                                fcmService.sendFCMMessage(alarm, keyword.getKeyword());
+                                try {
+                                    fcmService.sendFCMMessage(alarm, keyword.getKeyword());
+                                } catch (Exception e) {
+                                    // FCM 전송 실패 시 로그 남기기
+                                    logger.error("FCM 알림 전송 중 오류 발생. 알림 ID: " + alarm.getId(), e);
+                                    // 트랜잭션 중단 없이 다음 작업으로 진행
+                                }
                             }
 
                         } catch (Exception e) {
@@ -109,7 +119,7 @@ public class AlarmService {
         LocalDate currentDate = LocalDate.now();
 
         for (User user : userList) {
-            List<Bookmark> bookmarkList = bookmarkRepository.findByUserAndCategoryOrderByCreatedAtDesc(user, "AcademicSchedule");;
+            List<Bookmark> bookmarkList = bookmarkRepository.findByUserAndCategoryOrderByCreatedAtDesc(user, "AcademicSchedule");
 
             if (bookmarkList != null) {
                 for (Bookmark bookmark : bookmarkList) {
