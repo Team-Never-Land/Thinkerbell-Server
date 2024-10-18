@@ -332,7 +332,7 @@ public class NoticeDeleteService {
             LocalDate noticeDate = notice.getPubDate();
             Period period = Period.between(noticeDate, currentDate);
 
-            if (period.getMonths() == 9 && period.getDays() == 20){
+            if (period.getYears() >= 3){
                 List<Bookmark> bookmarks = bookmarkRepository.findALLByCategoryAndNoticeID("TeachingNotice", notice.getId());
                 bookmarkRepository.deleteAll(bookmarks);
 
